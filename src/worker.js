@@ -1,5 +1,5 @@
 // Cloudflare Worker (Static Assets rejimida)
-// - "/api/generate-quiz" so'rovlarini o'zi qayta ishlaydi (Anthropic API bilan gaplashadi)
+// - "/api/generate-quiz" so'rovlarini o'zi qayta ishlaydi (Google Gemini API bilan gaplashadi)
 // - Qolgan barcha so'rovlarni ASSETS orqali (public/ papkasidagi statik fayllar) qaytaradi
 
 const corsHeaders = {
@@ -29,9 +29,9 @@ export default {
 
 async function handleGenerateQuiz(request, env) {
   try {
-    if (!env.ANTHROPIC_API_KEY) {
+    if (!env.GEMINI_API_KEY) {
       return json(
-        { error: "ANTHROPIC_API_KEY sozlanmagan. Cloudflare -> Settings -> Variables and Secrets bo'limida qo'shing." },
+        { error: "GEMINI_API_KEY sozlanmagan. Cloudflare -> Settings -> Variables and Secrets bo'limida qo'shing." },
         500
       );
     }
@@ -48,38 +48,39 @@ async function handleGenerateQuiz(request, env) {
 Bu mavzu kurs dasturida ${difficultyTag || "O'rta"} darajaga to'g'ri keladi. ${difficultyInstr || ""}
 Shu DevOps mavzusi bo'yicha aynan ${safeCount} ta ko'p tanlovli test savoli tuz (o'zbek tilida, amaliy va aniq).
 Har bir savolda aynan 4 ta variant bo'lsin va faqat bitta to'g'ri javob bo'lsin.
-FAQAT quyidagi JSON massiv formatida javob ber — hech qanday qo'shimcha matn, sarlavha yoki markdown belgisi ("\`\`\`") qo'shma:
+FAQAT quyidagi JSON massiv formatida javob ber — hech qanday qo'shimcha matn, sarlavha yoki markdown belgisi qo'shma:
 [{"q":"savol matni","options":["variant A","variant B","variant C","variant D"],"correct":0,"explain":"juda qisqa (10 so'zgacha) tushuntirish"}]
 Har bir maydonni imkon qadar qisqa va lo'nda yoz.`;
 
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": env.ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1500,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.7,
+          },
+        }),
+      }
+    );
 
-    if (!anthropicRes.ok) {
-      const errText = await anthropicRes.text();
-      return json({ error: "Anthropic API xatosi", detail: errText }, anthropicRes.status);
+    if (!geminiRes.ok) {
+      const errText = await geminiRes.text();
+      return json({ error: "Gemini API xatosi", detail: errText }, geminiRes.status);
     }
 
-    const data = await anthropicRes.json();
-    const text = (data.content || []).map((b) => b.text || "").join("");
+    const data = await geminiRes.json();
+    const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
     const clean = text.replace(/```json|```/g, "").trim();
 
     let arr;
     try {
       arr = JSON.parse(clean);
     } catch (e) {
-      return json({ error: "Model javobini o'qib bo'lmadi" }, 502);
+      return json({ error: "Model javobini o'qib bo'lmadi", detail: text.slice(0, 300) }, 502);
     }
 
     if (!Array.isArray(arr)) {
