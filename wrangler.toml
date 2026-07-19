@@ -1,4 +1,4 @@
-name = "uzbe-devops-lms"
+name = "uzbe001"
 main = "src/worker.js"
 compatibility_date = "2024-09-23"
 
