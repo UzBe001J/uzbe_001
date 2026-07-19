@@ -52,24 +52,36 @@ FAQAT quyidagi JSON massiv formatida javob ber — hech qanday qo'shimcha matn, 
 [{"q":"savol matni","options":["variant A","variant B","variant C","variant D"],"correct":0,"explain":"juda qisqa (10 so'zgacha) tushuntirish"}]
 Har bir maydonni imkon qadar qisqa va lo'nda yoz.`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.7,
-          },
-        }),
-      }
-    );
+    // Google modellarni tez-tez yopib/nomini o'zgartirib turadi, shu sabab
+    // bir nechta model nomini ketma-ket sinab ko'ramiz - biri ishlamasa, keyingisiga o'tamiz.
+    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash-001"];
+    let geminiRes = null;
+    let lastErrText = "";
+
+    for (const model of candidateModels) {
+      geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              temperature: 0.7,
+            },
+          }),
+        }
+      );
+      if (geminiRes.ok) break;
+      lastErrText = await geminiRes.text();
+      // Agar sabab "model topilmadi" bo'lsa - keyingi modelni sinaymiz.
+      // Boshqa xato turlari (masalan limit tugagan) bo'lsa ham davom etamiz, chunki
+      // boshqa model boshqa kvotaga ega bo'lishi mumkin.
+    }
 
     if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      return json({ error: "Gemini API xatosi", detail: errText }, geminiRes.status);
+      return json({ error: "Gemini API xatosi", detail: lastErrText }, geminiRes.status);
     }
 
     const data = await geminiRes.json();
