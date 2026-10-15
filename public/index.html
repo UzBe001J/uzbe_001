@@ -829,6 +829,30 @@
     font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;padding:12px;resize:vertical;
   }
   .note-textarea:focus{outline:none;border-color:var(--teal);}
+
+  /* ---- Yumaloq burchaklar (qirrasiz ko'rinish) ---- */
+  .side-nav .tab-btn,.stat,.tab-btn,.dash-card,.mini-sec,.activity-item,.graf-board,.graf-stat,.graf-panel,.graf-bar-row,.mon-row,.pace-row,.timeline-item,.cal-empty-note,.cal-empty-note button,.cal-day-detail,.cal-day-item,.back-btn,.section,.topics-panel,.topic-row,.topic-del.confirm,.add-topic-row,.add-topic-form input[type=text],.add-topic-form select,.btn,.yt-search-form input[type=text],.detail-head,.done-toggle,.subsec,.subsec-head,.res-list li,.task-list li,.detail-textarea,.add-res-form input[type=text],.reset-btn,.pwd-toggle-btn,.pwd-form input,.admin-grid,.admin-search,.admin-refresh,.diff-row,.student-row,.student-detail,.quiz-topic-head,.quiz-card,.quiz-option,.quiz-explain,.quiz-score-banner,.auth-tabs,.pwd-eye-btn,.profile-bar,.logout-btn,.greet-card,.note-textarea{border-radius:12px;}
+  .sidebar-close-btn,.bar-outer,.graf-gauge-track,.graf-bar-track,.mon-bar-outer,.cal-nav-btn,.cal-cell,.checkbox,.custom-tag,.res-tag,.role-badge,.student-status,.student-bar-outer,.best-badge,.streak-chip{border-radius:8px;}
+  .bar-outer,.graf-bar-track,.graf-gauge-track,.mon-bar-outer,.student-bar-outer{border-radius:999px;overflow:hidden;}
+  .graf-panel,.quiz-card,.dash-card,.student-detail{overflow:hidden;}
+
+  /* ---- Kirish oynasi: yangi orqa fon va yumaloq karta ---- */
+  .auth-wrap{
+    background-color:#0b1220;
+    background-image:linear-gradient(rgba(8,12,22,.25), rgba(8,12,22,.35)), url("login-bg.jpg");
+    background-size:cover;background-position:center;background-repeat:no-repeat;
+  }
+  .auth-wrap{position:fixed;inset:0;z-index:2000;overflow-y:auto;min-height:0;}
+  .auth-card{
+    border-radius:22px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(20,26,38,.72);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    box-shadow:0 24px 70px rgba(0,0,0,.55);
+  }
+  .auth-field input{border-radius:12px;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);}
+  .auth-field input:focus{border-color:var(--amber);}
+  .pwd-eye-btn{border-radius:8px;}
+  .auth-submit{border-radius:12px;}
 </style>
 </head>
 <body>
