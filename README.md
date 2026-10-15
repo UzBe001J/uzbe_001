@@ -60,3 +60,5 @@ Pages -> **Custom domains** orqali o'z domeningizni ham ulashingiz mumkin.
   qo'yildi, o'zingiznikini kiritishingiz kerak (yuqoridagi 2-qadam).
 - Dizayn allaqachon CSS Grid (`auto-fit`/`minmax`) asosida qurilgan bo'lib, PC, planshet
   va telefon o'lchamlariga avtomatik moslashadi — qo'shimcha o'zgartirish talab qilinmadi.
+
+  
