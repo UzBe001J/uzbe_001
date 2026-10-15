@@ -54,7 +54,14 @@ Har bir maydonni imkon qadar qisqa va lo'nda yoz.`;
 
     // Google modellarni tez-tez yopib/nomini o'zgartirib turadi, shu sabab
     // bir nechta model nomini ketma-ket sinab ko'ramiz - biri ishlamasa, keyingisiga o'tamiz.
-    const candidateModels = ["gemini-2.5-flash", "gemini-flash-latest", "gemini-2.0-flash-001"];
+    // 2.0 modellar yopilgan, 2.5 esa faqat eski foydalanuvchilarga ochiq (yangi kalitda 404 beradi).
+    const candidateModels = [
+      "gemini-3.6-flash",
+      "gemini-3.5-flash-lite",
+      "gemini-3.8-flash",
+      "gemini-flash-latest",
+      "gemini-2.5-flash",
+    ];
     let geminiRes = null;
     let lastErrText = "";
 
